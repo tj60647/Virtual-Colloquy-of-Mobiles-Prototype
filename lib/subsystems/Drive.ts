@@ -9,7 +9,7 @@
  * the 2018 physical reconstruction by McLeish.
  *
  * @see docs/terminology.md for canonical terminology
- * @see docs/reference/mcleish/system-design/ for technical specifications
+ * @see Colloquy-of-Mobiles-Virtual-Simulation (flagship) docs/colloquy/system-diagrams/ for technical specifications
  */
 
 export interface DriveState {

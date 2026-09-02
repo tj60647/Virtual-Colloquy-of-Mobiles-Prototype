@@ -6,7 +6,7 @@
  *
  * Composes DriveSubsystem (Behavior), ControlSubsystems (Movement), and Components (Sensors/Actuators).
  *
- * @see docs/reference/mcleish/system-design/
+ * @see Colloquy-of-Mobiles-Virtual-Simulation (flagship) docs/colloquy/system-diagrams/
  */
 
 import {

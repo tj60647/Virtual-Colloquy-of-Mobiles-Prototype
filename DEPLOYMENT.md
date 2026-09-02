@@ -1,5 +1,10 @@
 # Deployment Guide
 
+> **Archived, February 2026.** This repository is an archived prototype; see `readme.md`. The
+> Vercel path below is the one that was actually used (`vercel.json` + `npm run build:demos`).
+> The GitHub Pages section describes a `npm run deploy:gh` script that does not exist in
+> `package.json` and was never added. Treat it as a sketch, not instructions.
+
 This guide explains how to deploy the Colloquy of Mobiles demo gallery to Vercel or GitHub Pages.
 
 ## Architecture

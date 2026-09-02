@@ -176,4 +176,4 @@ Alive
 
 - `docs/reference/pask/` - Pask's original writings
 - `docs/reference/mcleish/` - McLeish 2018 implementation documentation
-- `docs/reference/mcleish/system-design/` - PlantUML diagrams (source for this initial draft)
+- PlantUML diagrams (source for this initial draft) - moved to the flagship repository, `docs/colloquy/system-diagrams/`

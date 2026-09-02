@@ -1,33 +1,21 @@
 # Virtual Simulation Development Documentation
 
-This directory contains ongoing development work for the Colloquy of Mobiles Virtual Simulation project.
+This directory holds working notes from the prototype's development (2024 - early 2026).
 
 ## Directory Structure
 
-### `level-of-effort/`
-
-**Feasibility studies and technical exploration for virtual simulation features**
-
-- Demo documentation showing proof-of-concept implementations
-- Level-of-effort studies for implementing specific subsystems
-- Technical feasibility assessments
-
 ### `prototypes/`
 
-**Experimental implementations and prototype code documentation**
-
-- Early-stage prototypes
-- Experimental features
-- Technical spikes
+Experimental implementations and prototype code documentation. Empty.
 
 ### `notes/`
 
-**Working notes and development observations**
+Working notes and development observations. Empty.
 
-- Implementation notes
-- Design decisions
-- Development journal
+## What moved, on 2 September 2026
 
-## About This Work
-
-This documentation represents ongoing work (2024-2026) on the **virtual simulation** of the Colloquy of Mobiles, distinct from the 2018 physical reconstruction documented in `docs/reference/mcleish/`.
+`level-of-effort/` - the eight level-of-effort demo write-ups (Transform, Config File,
+Config File Loader V1, JSON + Config File, JSON + Config File Builder, Sensor + Actuator,
+Transceivers V2, Drive Levels and States V2) - moved to the flagship repository,
+[Colloquy-of-Mobiles-Virtual-Simulation](https://github.com/tj60647/Colloquy-of-Mobiles-Virtual-Simulation),
+at `docs/archive/level-of-effort/`.

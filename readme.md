@@ -1,710 +1,338 @@
-# Colloquy of Mobiles Virtual Simulation
+# Colloquy of Mobiles Simulation Prototype — four teaching demos and the behavior model that came before the live system
 
-This project is a virtual simulation of Gordon Pask's "Colloquy of Mobiles," modeling autonomous entities that interact and communicate through light and sound. The simulation aims to reconstruct the complex social behaviors of the original cybernetic installation.
+This repository is **archived**. It is the 2024–early-2026 TypeScript prototype for a virtual
+simulation of Gordon Pask's _Colloquy of Mobiles_: four working browser demos, a pre-consolidation
+behavior model in `lib/`, and a curriculum plan for demos that were never built. The live system —
+the agent-based simulation engine, the simulation server, the display client, Scene Studio, the
+guide, the clip editor, the simulation console, and the sensor, actuator and transmitter clients —
+moved to **[Colloquy-of-Mobiles-Virtual-Simulation](https://github.com/tj60647/Colloquy-of-Mobiles-Virtual-Simulation)**
+— a private repository — and runs, publicly, at <https://colloquyscenestudio.aroughidea.com>.
+Go there for anything current.
 
-## Directory Structure
+What is kept here is worth keeping for two reasons. The four demos are good teaching objects: each
+one isolates a single idea and shows it moving. And the position statement below — on what can and
+cannot be known about the 1968 installation — still governs the whole project.
 
-- **apps/**: Contains distinct runnable applications and demos.
-  - `demo-TS-01-transform-hierarchy/`: First completed TypeScript demo.
-  - `demo-TS-template/`: Template for creating new demos.
-  - `public/`: Gallery landing page for demo suite.
-  - `SimulationConfigurationFiles/`: JSON configurations with schema validation.
-- **lib/**: Shared core library (TypeScript).
-  - `Mobile.ts`, `Environment.ts`, `Transform.ts`: Core simulation classes.
-  - `SceneGraphLoader.ts`: Parses config files (v2) and instantiates scene graph.
-  - `subsystems/`: Paskian internal systems (drives, oscillators).
-  - `components/`: External attachments (sensors, actuators).
-  - `visualization/`: THREE.js rendering wrappers.
-  - `types/`: TypeScript type definitions.
-- **docs/**: Project documentation, system diagrams, and refactoring plan.
+---
 
-## Technology Stack
+## What works today
 
-### Core
-- **TypeScript** - Type-safe simulation logic and visualization
-- **Three.js** (v0.168.0) - 3D rendering and scene graph
-- **Vite** - Fast build tool and dev server
-- **Node.js** - Runtime for scripts and future WebSocket server
+Four demos are built and live. The gallery is at
+<https://colloquy-of-mobiles-virtual-simulat.vercel.app> (Vercel project
+`colloquy-of-mobiles-simulation-prototype`); all four demo pages answered on
+2 September 2026.
 
-### Demos & Visualization
-- **Vanilla TypeScript** - No UI frameworks (React, Vue, etc.)
-- **Custom CSS** - No CSS frameworks (Tailwind, Bootstrap, etc.)
-- **Reason:** Demos prioritize 3D simulation over UI complexity (~50 lines of UI code per demo doesn't warrant framework overhead)
+| Demo                   | Directory                              | What it shows                                                                                                                                                                                                                                                                                         |
+| ---------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 00 Schema Lab          | `apps/demo-TS-00-schema-view/`         | Schema-first workspace. Shows `simulation-config.schema.json` (legacy abstract) and `simulation-config-v2.schema.json` (runtime-oriented v2) side by side and reports whether the loaded config satisfies each. The config picker offers one option, `config_240812.json`.                            |
+| 01 Transform Hierarchy | `apps/demo-TS-01-transform-hierarchy/` | Parent-child transforms in the scene graph: a static four-node chain — root, child, grandchild, great-grandchild — with per-node axes, labels, a polar grid and a live JSON view. The rotation code is still in `main.ts`; nothing calls it.                                                          |
+| 02 Motion Profiles     | `apps/demo-TS-02-motion-profiles/`     | The trapezoidal profile generator in `lib/subsystems/MotionProfile.ts`, graphed as position, velocity, acceleration and jerk, with a circular rotation view and vector overlays.                                                                                                                      |
+| 03 Oscillator Basics   | `apps/demo-TS-03-oscillator-basics/`   | Oscillator-driven transform animation: six mobiles — three females, two males, the beam — released into oscillation, a RELEASED/STOPPED toggle, and compound oscillation through parent-child hierarchies. Its info panel promises sine and triangle profiles; only the trapezoidal generator exists. |
 
-### Testing & Quality
-- **Jest** - Unit testing
-- **ESLint + Prettier** - Code quality and formatting
-- **TypeScript** - Compile-time type checking
+`apps/demo-TS-template/` is the boilerplate the four were cut from.
 
-### Deployment
-- **Vercel** - Static site hosting for gallery + demos
-- **GitHub** - Version control and CI/CD
+The gallery page (`apps/public/index.html`) lays out **20 cards, numbered 00 through 19**. Four are
+live links; the other sixteen carry the `disabled` class — dimmed, marked "Coming Soon" — but they
+are still anchors with real `href`s, so clicking one lands on a 404. That is the honest shape of
+this repository: a plan for twenty, four of them built.
 
-**Philosophy:** Minimal dependencies, maximum control. Frameworks add weight and complexity where they're not needed. See [docs/UI_ARCHITECTURE.md](docs/UI_ARCHITECTURE.md) for canonical architecture/rationale and [docs/UI_STANDARDS.md](docs/UI_STANDARDS.md) for visual standards.
+## What was never built
 
+Stated plainly, because the old README implied otherwise:
 
-## Simulation Philosophy & Architecture
-### Position Statement: Simulating the 2018 Interpretation
-This simulation is strictly based on the **2018 physical reconstruction by McLeish**, which is an *interpretation* of the original work.
+- **There is no server.** No WebSocket server, no state broadcast, no distributed anything. `lib/types/websocket.ts` declares a message protocol; nothing implements it.
+- **There is no pulse communication.** No `lib/communication/`, no `Pulse*` class anywhere in `lib/`. Mobiles cannot signal each other.
+- **Mobiles do not tick their drives.** `Mobile.update()` calls `horizontalControlSubsystem.act()`, optionally `verticalControlSubsystem.act()`, then re-derives orientation. That is all it does. `DriveSubsystem` exists and is unit-tested, but nothing in the update loop advances it — it advances itself, on a `setInterval` its own constructor starts (`DriveSubsystem.ts:70`, `:156`).
+- **Sensors and actuators do not reach each other.** `SensorBase.isInFieldOfView()` does a real cone test and `LightSensor.sense()` takes a callback, but `Environment.update()` only iterates mobiles. No environment-level light or sound propagation exists.
+- **No beam arbitration, no male or female behavior state machines.** The word "Beam" appears in `lib/Mobile.ts` only as a doc comment describing a structural component.
 
-The dynamic experience of Gordon Pask's original 1968 installation (the motion, sound, and light interactions) is primarily lost to history:
--   There are no known recordings of the piece in motion.
--   There is no surviving audio.
--   Most photographs show the system powered off.
--   The original 1968 schematic diagrams were not strictly followed in construction (as noted by Mark Dowson).
+So: it is a scene graph, a motion-profile generator, an oscillator, a drive accumulator and a
+sensor/actuator geometry library — not a running colloquy. The demos exercise the first three.
 
-Therefore, this project simulates the **2018 interpretation of Pask's intent**. Where the 1968 record is static or ambiguous, the specific behavioral logic, timing, and sensory interactions visualized here are derived entirely from the choices made in the 2018 reconstruction project (documented in `docs/reference/mcleish`).
+## What moved
 
-### Simulating Analog Concurrency
+On **2 September 2026** four directories left this repository for the flagship. The flagship
+copies are committed and pushed; nothing was lost.
+
+| Was here                                                                                                      | Now                                                    |
+| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `docs/reference/mcleish/system-design/` — the PlantUML diagram library and `DIAGRAM_ASSESSMENT_2026-07-18.md` | flagship `docs/colloquy/system-diagrams/`              |
+| `docs/reference/mcleish/physical-build/` — photographs, elevations, light and sensor layout artwork           | flagship `docs/colloquy/physical-build/`               |
+| `docs/reference/dowson/` — Dowson's recollections and correspondence                                          | flagship reference library (local-only, not committed) |
+| `docs/development/level-of-effort/` — eight level-of-effort demo write-ups                                    | flagship `docs/archive/level-of-effort/`               |
+
+The diagrams in particular kept being edited after this repository stopped being the working copy.
+The flagship versions are the current ones.
+
+The museum-installation vision that used to occupy most of this README — hardware lists, network
+topology, deployment strategy, a six-component software architecture — has moved to
+[`docs/archive/MUSEUM_INSTALLATION_VISION.md`](docs/archive/MUSEUM_INSTALLATION_VISION.md). Most of
+what it describes now exists, built differently, in the flagship repository. That archive maps
+each item to what actually shipped.
+
+---
+
+## Running it
+
+Root scripts, quoted from `package.json`:
+
+| Script                                      | Command                                         | What it does                                                                                                                                                             |
+| ------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run build:demos`                       | `node scripts/build-all-demos.mjs`              | Finds every `apps/demo-TS-*` with a `package.json`, runs `npm install` and `npm run build` in each, copies `apps/public/` and each demo's `dist/` into the root `dist/`. |
+| `npm run dev:gallery`                       | `npm run build:demos && npx serve dist -p 3000` | Builds everything, then serves the gallery on port 3000.                                                                                                                 |
+| `npm run dev:cleanup`                       | `powershell … ./scripts/kill-dev-servers.ps1`   | Kills stray node servers on ports 3000–3010. Windows only.                                                                                                               |
+| `npm run build`                             | `tsc`                                           | Compiles `lib/` per `tsconfig.json`.                                                                                                                                     |
+| `npm run type-check`                        | `tsc --noEmit`                                  | Type check without emit.                                                                                                                                                 |
+| `npm run watch`                             | `tsc --watch`                                   |                                                                                                                                                                          |
+| `npm run lint` / `lint:fix`                 | `eslint .`                                      |                                                                                                                                                                          |
+| `npm run format` / `format:check`           | `prettier` over `**/*.{js,ts,json,md}`          |                                                                                                                                                                          |
+| `npm test` / `test:watch` / `test:coverage` | `jest`                                          |                                                                                                                                                                          |
+| `npm run deploy`                            | `npm run build:demos && vercel deploy --prod`   |                                                                                                                                                                          |
+
+There is **no `npm start`** at the root and no root server. The only `server.js` and `Procfile` in
+the repository sit inside `apps/demo-TS-01-transform-hierarchy/`, where `npm start` runs
+`node server.js` — a small Express host for that one demo.
+
+Earlier drafts of this README described a root `server.js` and a Heroku deployment. Both were real
+once: a root `server.js` and `Procfile` existed from 27 August 2024 and were deleted on
+9 February 2026 (commit `bf506c3`), and this README went on describing them until now. Deployment
+has been Vercel static hosting since; the only Heroku `Procfile` left is demo 01's.
+
+To work on a single demo, run it in its own directory:
+
+```bash
+cd apps/demo-TS-02-motion-profiles
+npm install
+npm run dev:vite     # or: npm run dev  (PowerShell wrapper that frees ports 3000-3002 first)
+```
+
+Each demo carries its own Vite build. **Vite is a devDependency of each demo, not of the root** —
+the root has exactly one runtime dependency, `three ^0.168.0`.
+
+## Tests
+
+`npx jest`, run 2 September 2026:
+
+```
+Test Suites: 1 failed, 8 passed, 9 total
+Tests:       1 failed, 34 passed, 35 total
+```
+
+**One test fails.** `lib/__tests__/MotionProfile.test.ts:19`,
+`MotionProfile > Initialization > should calculate trapezoidal profile`:
+
+```
+Expected: 12.3
+Received: 12
+Expected precision:    1
+Expected difference: < 0.05
+Received difference:   0.3000000000000007
+```
+
+The test's own comment works the closed-form answer out to 12 s (2 s accelerating, 8 s cruising,
+2 s decelerating) and then asserts 12.3 s, with the note "due to inclusive endpoints and 3 phases".
+The generator returns 12. Whichever side is wrong, it is the assertion and the generator that
+disagree, not the maths and the code. Neither `lib/subsystems/MotionProfile.ts` nor its test has
+been edited since 11 February 2026, so this has been red at least that long. It is left as it
+stands. The demo does not exercise the case: `apps/demo-TS-02-motion-profiles/` runs the generator
+at distance 120, max velocity 15, max acceleration 15 and a 1/40 s timestep, in yo-yo mode — not
+the test's 100 / 10 / 5 at the default 0.1 s.
+
+Jest also warns that a worker failed to exit gracefully. The open handle is the drive timer:
+`DriveSubsystem`'s constructor starts a `setInterval`, and `Environment.test.ts` is the one suite
+that builds Mobiles without a `stopTimer()` teardown, so run on its own it never exits at all.
+
+Config: `jest.config.js`, `ts-jest` preset, `node` environment, roots `lib/` and `apps/`, cache
+disabled.
+
+---
+
+## Repository layout
+
+```
+apps/
+  demo-TS-00-schema-view/          Schema Lab (built, deployed)
+  demo-TS-01-transform-hierarchy/  Transform Hierarchy (built, deployed; has server.js + Procfile)
+  demo-TS-02-motion-profiles/      Motion Profiles (built, deployed)
+  demo-TS-03-oscillator-basics/    Oscillator Basics (built, deployed)
+  demo-TS-template/                Boilerplate for a new demo
+  public/                          Gallery landing page (index.html, gallery.css)
+  SimulationConfigurationFiles/    config.json, config_v2.json, config_240812.json,
+                                   config_v2_example.json + two JSON schemas
+lib/
+  Mobile.ts                        Autonomous entity; extends Transform
+  Environment.ts                   Holds mobiles, ticks them, serializes the world
+  Transform.ts                     Scene-graph node: local/world transform, parent-child
+  SceneGraphLoader.ts              Two-phase loader for config v2
+  math/Vector3.ts                  Minimal vector maths
+  subsystems/                      Drive, DriveSubsystem, MotionProfile, Oscillator,
+                                   HorizontalControlSubsystem, VerticalControlSubsystem
+  components/                      SensorBase, ActuatorBase, LightSensor, SoundSensor,
+                                   LightActuator, SoundActuator
+  visualization/                   THREE.js wrappers (.js), plus TypeScript:
+                                   renderers/ThreeJSRenderer.ts, utils/CameraController.ts,
+                                   ui/ (CameraControlPanel, MotionProfilesPanel, icons, styles)
+  types/                           drives, events, math, state, websocket (+ its own __tests__)
+  legacy/                          Deprecated p5.js code, isolated to prevent import. Do not use.
+  __tests__/                       8 suites: Drive, DriveSubsystem, Environment,
+                                   HorizontalControlSubsystem, Mobile, MotionProfile,
+                                   SceneGraphLoader, Transform
+  tests/                           README only
+docs/                              See below; includes demo-examples/ (README and card templates)
+scripts/                           build-all-demos.mjs, kill-dev-servers.ps1
+assets/                            One webfont (Roboto Regular)
+test-debug.ts, test-loader.ts, test-serialize.ts    Root-level diagnostic scripts, not Jest suites
+```
+
+`lib/visualization/` is deliberately mixed: the older THREE.js wrappers are still `.js`, and the
+newer renderer, camera controller and UI panels are `.ts`. The migration stopped there.
+
+### Documentation
+
+| File                                                          | What it is                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/DEMO_REFACTORING_PLAN.md`                               | The curriculum. Its inventory enumerates Demos 1–19 across five tiers; a later specification section in the same file still uses an earlier 1–17 numbering and has two different sections both labeled "Demo 14". Demo 00 postdates the plan and is not in it. |
+| `docs/REFACTORING_PLAN.md`                                    | TypeScript migration phases.                                                                                                                                                                                                                                   |
+| `docs/PULSE_COMMUNICATION_ARCHITECTURE.md`                    | Design for the pulse communication that was never implemented.                                                                                                                                                                                                 |
+| `docs/CAMERA_CONTROLLER_SPEC.md`                              | Specification for `lib/visualization/utils/CameraController.ts`.                                                                                                                                                                                               |
+| `docs/UI_ARCHITECTURE.md`, `docs/UI_STANDARDS.md`             | Why the demos use no UI framework, and the visual standards they follow.                                                                                                                                                                                       |
+| `docs/demo-examples/`                                         | Two worked examples — demo 01 and a hypothetical demo 4.5 — each as a demo README and a gallery card.                                                                                                                                                          |
+| `docs/TESTING_AND_LINTING.md`, `docs/TYPESCRIPT_MIGRATION.md` | Tooling notes.                                                                                                                                                                                                                                                 |
+| `docs/terminology.md`                                         | Canonical mapping between Pask's concepts and this codebase.                                                                                                                                                                                                   |
+| `docs/archive/MUSEUM_INSTALLATION_VISION.md`                  | The archived installation vision, with a map to what the flagship actually built.                                                                                                                                                                              |
+| `docs/reference/pask/`                                        | Pask's own writings on the Colloquy (1968).                                                                                                                                                                                                                    |
+| `docs/reference/mcleish/`                                     | The 2018 reconstruction's "How It Works, Recollections, and Observations". The diagrams and build photographs that used to live here are now in the flagship.                                                                                                  |
+| `DEPLOYMENT.md`, `TODO.md`                                    | Deployment guide and the last sprint board, both frozen at February 2026.                                                                                                                                                                                      |
+
+---
+
+## Simulation philosophy and architecture
+
+### Position statement: simulating the 2018 interpretation
+
+This simulation is strictly based on the **2018 physical reconstruction by McLeish**, which is an
+_interpretation_ of the original work.
+
+The dynamic experience of Gordon Pask's original 1968 installation (the motion, sound, and light
+interactions) is primarily lost to history:
+
+- There are no known recordings of the piece in motion.
+- There is no surviving audio.
+- Most photographs show the system powered off.
+- The original 1968 schematic diagrams were not strictly followed in construction (as noted by Mark Dowson).
+
+Therefore, this project simulates the **2018 interpretation of Pask's intent**. Where the 1968
+record is static or ambiguous, the specific behavioral logic, timing, and sensory interactions
+visualized here are derived entirely from the choices made in the 2018 reconstruction project.
+
+### Simulating analog concurrency
+
 Pask's installation was a system of **analog, concurrent entities**. To simulate this digitally:
 
-1.  **Orchestrated Updates**: We use a **Synchronous Simulation Loop**, updating every Mobile once per "tick".
-2.  **Apparent Autonomy**: From the user's perspective, Mobiles appear to act independently and simultaneously, preserving the social dynamics Pask intended.
+1. **Orchestrated updates**: We use a **synchronous simulation loop**, updating every Mobile once per "tick".
+2. **Apparent autonomy**: From the user's perspective, Mobiles appear to act independently and simultaneously, preserving the social dynamics Pask intended.
 
 **Why not true parallel threads?**
-While modern web technologies (Web Workers) allow parallelism, they introduce significant complexity (race conditions, shared state management) that distracts from the core goal: **modeling the social cybernetics**. Our synchronous loop provides the necessary reliability to explore the *interaction logic* defined in the 2018 reconstruction.
+While modern web technologies (Web Workers) allow parallelism, they introduce significant
+complexity (race conditions, shared state management) that distracts from the core goal:
+**modeling the social cybernetics**. Our synchronous loop provides the necessary reliability to
+explore the _interaction logic_ defined in the 2018 reconstruction.
 
-### Architecture Patterns (The "How")
-*   **Agent-Based**: Each Mobile is a self-contained entity with private state (Drives, Position).
-*   **Composition**: Mobiles obey the "Has-A" relationship (A Mobile *has a* DriveManager), allowing modular upgrades.
-*   **Hierarchical State Machines**: Behavior is organized in nested layers (Alive → Unsatisfied → Searching) to enforce valid logic.
+### Architecture patterns (the "how")
 
-## System Architecture & Behavior
+- **Agent-based**: Each Mobile is a self-contained entity with private state (drives, position).
+- **Composition**: Mobiles obey the "has-a" relationship (a Mobile _has a_ DriveSubsystem), allowing modular upgrades.
+- **Hierarchical state machines**: Behavior is organized in nested layers (Alive → Unsatisfied → Searching) to enforce valid logic.
 
-The simulation follows the system model defined in the 2018 Implementation diagrams. The system consists of three primary agent types: Male Mobiles, Female Mobiles, and the central Beam (Bar).
-
-### 1. Shared Drive System (Males & Females Only)
-
-The Male and Female agents are "Driven Agents," governed by a unified drive system that creates internal needs.
-
-- **Variables**: Two internal drives, **Drive O** and **Drive P**.
-- **Continuous Increment**: Drives increment continuously over time.
-- **Thresholds**:
-  - **Satisfied**: Drives < Lower Limit. Agent is inert.
-  - **Unsatisfied**: Drive > Lower Limit. Agent triggers a search.
-  - **Dominant Logic**: Agents prioritize the higher drive (e.g., if O > P, search for O-interaction).
-- **Satisfaction (Reduction)**: Successful engagement with a partner decrements the specific drive until it falls below the threshold.
-- **Key Diagrams**:
-  - [Drive Logic & Hierarchy](docs/reference/mcleish/system-design/ARCHIVE_PlantUML_Diagrams/Hierarchical%20State%20Diagram_OP.plantuml)
-  - [Drive Manager Activity](docs/reference/mcleish/system-design/ARCHIVE_PlantUML_Diagrams/activityDiagram_driveManager_full.plantuml)
-
-### 2. Male Mobiles
-
-The Male mobile is an autonomous agent utilizing the Shared Drive System to seek satisfaction.
-
-- **Goal**: Keep Drive O and Drive P low.
-- **Subsystems**:
-  - `Drive Sub-system`: Instance of the Shared Drive System.
-  - `Horizontal Sub-system`: Rotates the body to search for partners.
-- **Behavior Loop**:
-  - **Search**: If Unsatisfied, oscillates horizontally.
-  - **Engage**: Locks onto a partner and exchanges signals to reduce drive.
-- **Key Diagrams**:
-  - [Interaction Flow](docs/reference/mcleish/system-design/SystemDiagrams_All/Male_System_Sequence_Diagram.plantuml)
-  - [Behavior Logic](docs/reference/mcleish/system-design/ARCHIVE_PlantUML_Diagrams/stateDiagram_male_behavior_240731.plantuml)
-
-### 3. Female Mobiles
-
-The Female mobile mirrors the Male structure but includes an additional degree of freedom.
-
-- **Goal**: Maintain Satisfaction; Respond to Male searches.
-- **Subsystems**:
-  - `Drive Sub-system`: Instance of the Shared Drive System.
-  - `Horizontal Control Sub-system`: Rotates the main body.
-  - `Vertical Reflector Sub-system`: Independent moving mirror for signal negotiation (Scanning/Locking).
-- **Behavior Loop**:
-  - Matches the Male's Search/Engage pattern but uses the Vertical Reflector to negotiate the connection.
-- **Key Diagrams**:
-  - [Interaction Flow](docs/reference/mcleish/system-design/SystemDiagrams_All/Female_System_Sequence_Diagram_Full.plantuml)
-  - [Behavior Logic](docs/reference/mcleish/system-design/ARCHIVE_PlantUML_Diagrams/stateDiagram_female_behavior_240731.plantuml)
-
-### 4. The Beam (The Bar)
-
-The Beam is a **Reactive Agent** that serves as the central arbitrator. Unlike the mobiles, it does **not** have internal entropy drives (O/P).
-
-- **Goal**: Arbitrate between Male I and Male II based on "Dominant Drive" received from them.
-- **Subsystems**:
-  - `Beam Motor Sub-system`: Moves the main arm.
-- **Behavior**:
-  - **Arbitration**: Compares `Drive I` vs `Drive II` inputs. The mobile with the higher drive controls the beam.
-  - **Motion**: Oscillates back and forth (Searching) or moves to a "Reinforcement Position".
-- **Key Diagrams**:
-  - [Beam Sequence & Arbitration](docs/reference/mcleish/system-design/SystemDiagrams_All/Beam_System_Sequence_Diagram.plantuml)
+The third pattern is aspirational in this repository. `lib/subsystems/DriveSubsystem.ts` computes a
+satisfied/unsatisfied state and a dominant drive; nothing above it consumes that state. The full
+hierarchy was built in the flagship, not here.
 
 ---
 
-## Reference Documentation
+## The model this was aiming at
 
-This implementation is based on **canonical documentation** by Gordon Pask and the McLeish 2018 implementation:
+Three agent types, from the 2018 implementation diagrams. Only the parts marked below reached code
+in this repository; the rest is here so the config schema and the half-built subsystems make sense.
 
-- **`docs/reference/pask/`** - Pask's original writings on the Colloquy of Mobiles (1968)
-- **`docs/reference/dowson/`** - Dowson's recollection and correspondence about Pask's work
-- **`docs/reference/mcleish/`** - Technical implementation specifications from the 2018 physical reconstruction
-- **`docs/development/`** - Ongoing virtual simulation development work (2024-2026)
-- **`docs/terminology.md`** - Standardized terminology guide defining Mobiles, Subsystems, Components, and behavioral states
+**Shared drive system (males and females).** Two internal drives, **O** and **P** — Orange and
+Puce, Pask's own colour labels, carried into the config as `orange` and `puce`. They increment
+continuously. Below their lower limit the agent is satisfied and inert; above it, unsatisfied and
+searching, prioritizing whichever drive is higher. Successful engagement with a partner decrements
+that specific drive back under the threshold. _In code:_ `lib/subsystems/Drive.ts` and
+`DriveSubsystem.ts` implement the accumulation, the thresholds and the dominant-drive resolution,
+including the equal-drives edge case. `DriveSubsystem.getDriveState()` says it follows
+`DriveManager.js` "exactly"; that file was deleted from `lib/` by the same commit that added the
+TypeScript port, so the claim can no longer be checked against anything in this repository. No tick
+calls any of it: `Mobile.update()` never touches the drive subsystem. The drives still creep,
+because every `DriveSubsystem` starts a `setInterval` in its constructor and every `Mobile`
+constructs one — but nothing reads the state that results.
 
-**Note:** All implementation decisions should align with these reference materials. The terminology guide provides the canonical mapping between Pask's concepts and this codebase.
+**Male mobiles.** Drive subsystem plus a horizontal subsystem that rotates the body to search for a
+partner; oscillate while unsatisfied, lock on and exchange signals to reduce drive. _In code:_
+`HorizontalControlSubsystem` drives the oscillation. The searching and engaging behavior does not
+exist.
 
-## Current Implementation Status
+**Female mobiles.** The same, plus a vertical reflector subsystem — an independently moving mirror
+used to negotiate the connection. _In code:_ `VerticalControlSubsystem` moves the reflector frame.
+The negotiation does not exist.
 
-**Last Updated:** February 11, 2026
+**The beam.** A reactive arbitrator with no drives of its own. It compares the dominant drive
+reported by Male I against Male II; the higher one takes control of the beam, which otherwise
+oscillates in search. _In code:_ nothing — and in `config_v2.json` the beam is not a drive-less
+arbitrator either. It is just another mobile: a base, a horizontal control frame, a full O/P drive
+block identical to the others, and a speaker and microphone. Nothing reads any of it.
 
-### TypeScript Core (Phases 1-7): ✅ Complete (Q1 2026)
-- ✅ Spatial positioning and scene graph (`Transform`)
-- ✅ Drive accumulation system (`DriveSubsystem`)
-- ✅ Motion control (`HorizontalControlSubsystem`, `VerticalControlSubsystem`)
-- ✅ Sensors and actuators with field-of-view detection
-- ✅ Configuration loading and JSON schema validation
-- ✅ 35 passing tests across 9 test suites
-- ✅ Config V2 with `SceneGraphLoader`
-- ✅ Complete type system in `lib/types/`
-
-### Demo Gallery (Phase A-F): ⏳ In Progress
-- ✅ Phase A: Foundation infrastructure (CameraController, ThreeJSRenderer)
-- ✅ Demo 1: Transform Hierarchy (deployed)
-- ⏳ Demos 2-5: Tier 1 Foundation (sensors, actuators, interaction, external inputs)
-- ⏳ Demos 6-9: Tier 2 Subsystems (drives, pulse communication, oscillators)
-- ❌ Demos 10-14: Blocked by Phase 7.5 (requires pulse communication for complete Mobiles)
-- ❌ Demos 15-17: Tools (config editor, serialization, performance)
-
-### Communication System (Phase 7.5): ⏳ Critical - In Progress
-**Missing Infrastructure (BLOCKING Tier 3/4 demos):**
-- Pulse transmission (temporal binary patterns)
-- Pattern vocabulary (I_O, I_P, II_O, II_P, etc.)
-- Circular buffers for pulse sequences
-- Message passing between Mobiles
-- Pattern matching framework
-
-**Current State:** Pulse communication requires implementation in TypeScript. The concept includes temporal binary patterns, circular buffers, pattern vocabulary (I_O, I_P, II_O, II_P), and message passing between Mobiles.
-
-**Documentation:** See `docs/PULSE_COMMUNICATION_ARCHITECTURE.md` and `docs/DEMO_REFACTORING_PLAN.md`.
-
-**Priority:** HIGH - Target completion Q1 2026
-
-### Network Layer (Phase 8): ❌ Future (Q3 2026+)
-- WebSocket server for distributed simulation
-- Sensor event handling
-- State broadcasting to viewing lenses
-- **Note:** Museum installation architecture - demos must complete first
-
-**Refactoring Status:** See `docs/REFACTORING_PLAN.md` for complete migration roadmap.
+The state, sequence and activity diagrams that specify all of this now live in the flagship
+repository under `docs/colloquy/system-diagrams/`.
 
 ---
 
-## Project Scope & Architecture
-
-### Current Development: Standalone Browser Demos
-
-**Status:** ✅ Active development (Phases 1-7 complete, Phase A-F in progress)
-
-This repository currently implements **standalone browser demonstrations** of the Colloquy simulation:
-- Each demo runs completely in the browser (no server required)
-- Simulation and visualization together in one application
-- Educational and development focus
-- Can be deployed as static files (GitHub Pages, Vercel, etc.)
-
-**See:** `docs/DEMO_REFACTORING_PLAN.md` for the 17-demo implementation plan
-
-### Future: Museum Installation Architecture
-
-**Status:** ⏳ Planned for Phase 8 (NOT YET IMPLEMENTED)
-
-The project will eventually support a **distributed museum installation** architecture:
-
-The project will eventually support a **distributed museum installation** architecture:
-
-This is the **core simulation engine** for a multi-component museum installation exploring Gordon Pask's cybernetic art. The installation will feature a **single virtual Colloquy simulation** with multiple **viewing lenses** (3D screen, VR, analytics) and **input interfaces** (sensor stations), all connected via WebSocket on a local network.
-
-**⚠️ IMPORTANT:** This distributed architecture is PLANNED but NOT BUILT. Current focus is on standalone browser demos.
-
----
-
-## Museum Installation Design (Phase 8 - Future)
-
-```
-Sensor Inputs → Virtual Colloquy Simulation (Heroku/Local) → Multiple Viewing Lenses
-(Webcam/Mic)    (Processes events, updates agent states)      (3D, VR, Time Series)
-```
-
-### The Virtual Colloquy Simulation (This Repository)
-
-**Single source of truth running on a local server or Heroku**
-
-- **Function**:
-  - Receives sensor input events (light, sound)
-  - Processes events and triggers agent behaviors
-  - Updates drive states, manages agent interactions
-  - Generates all simulation data
-  - Broadcasts state updates to all connected viewing lenses
-- **Technology⏳ Core simulation complete; ⚠️ WebSocket integration (Phase 8) not start
-- **Deployment**:
-  - **Primary**: Local server on museum network (laptop/mini PC running `npm start`)
-  - **Optional**: Heroku for remote demos and development
-- **Status**: ✅ Core agent behaviors implemented; ⚠️ WebSocket integration needed
-
----
-
-## Installation Components
-
-### Input Interfaces
-
-#### 1. Interactive Sensor Stations
-
-**Browser-based webcam/microphone interfaces for visitor engagement**
-
-- **Purpose**: Visitors shine light (via webcam) or make sound (via microphone) to interact with virtual agents
-- **Technology**:
-  - Browser Web APIs: `getUserMedia()`, Canvas API (brightness analysis), Web Audio API (volume detection)
-  - WebSocket publisher to simulation server
-- **Deployment**: Static HTML/JS app (can run from local files or Vercel)
-- **Status**: ⚠️ Sensor classes exist in `lib/`; browser-based sensor app needed
-- **Interaction**: Multiple stations publish sensor events to central simulation
-
----
-
-### Viewing Lenses (All Subscribe to Same Simulation Data)
-
-#### 2. 3D Screen View
-
-**Large screen or projection showing the live simulation**
-
-- **Purpose**: Primary visualization of autonomous agents exhibiting emergent behaviors
-- **Technology**: THREE.js browser-based 3D rendering
-- **Deployment**: Static app connecting to local simulation server via WebSocket
-- **Status**: ⏳ Planned (Phase 8 - after demos complete)
-
-#### 3. VR Experience
-
-**Immersive headset view of the same simulation**
-
-- **Purpose**: Visitors experience the Colloquy in immersive 3D space
-- **Technology**: THREE.js + WebXR API or A-Frame
-- **Deployment**: Static WebXR app connecting to local simulation server
-- **Status**: ❌ Not yet implemented
-- **Hardware**: Meta Quest, HTC Vive, or any WebXR-compatible headset
-
-#### 4. Time Series Dashboard
-
-**Real-time analytics and metrics (like video game stats)**
-
-- **Purpose**: Display live simulation data: drive states, interaction counts, agent behaviors over time
-- **Technology**: Real-time charts/graphs pulling from simulation WebSocket feed
-- **Deployment**: Static dashboard app
-- **Status**: ❌ Not yet implemented
-- **Data Examples**:
-  - Drive O/P levels for each agent
-  - Interaction frequency heatmaps
-  - Satisfaction/search state timelines
-  - Visitor engagement metrics
-
----
-
-### Educational Components (Separate from Core Simulation)
-
-#### 5. Conversational Agent: Author's Writings
-
-**Text-based chat discussing the work using the author's research**
-
-- **Purpose**: Educational dialogue about the installation, cybernetics, and contemporary relevance
-- **Technology**: LLM (OpenAI/Anthropic) with RAG; text interface (voice via STT/TTS later)
-- **Deployment**: Vercel (serverless API routes for LLM calls)
-- **Status**: ❌ Not yet implemented
-
-#### 6. Conversational Agent: Pask's Writings
-
-**Text-based chat discussing Gordon Pask's original work**
-
-- **Purpose**: Deep dive into Pask's cybernetic theories and Colloquy of Mobiles (1968)
-- **Technology**: LLM with RAG using Pask's writings and papers
-- **Deployment**: Vercel (may share infrastructure with #5)
-- **Status**: ❌ Not yet implemented
-
-#### 7. Interactive Diagram Poster
-
-**State machines and agent-based model visualizations**
-
-- **Purpose**: Educational reference showing technical architecture
-- **Technology**: Interactive web diagrams or static print/PDF
-- **Deployment**: Vercel (static content) or physical poster
-- **Status**: ✅ Diagrams exist in `docs/reference/mcleish/system-design/`
-
-#### 8. Contemporary Comparison Interactive
-
-**Multiplayer experience comparing Pask's agents to modern AI systems**
-
-- **Purpose**: Bridge historical cybernetics to contemporary LLM agents through gameplay
-- **Technology**: TBD (multiplayer where all players may be agents)
-- **Deployment**: TBD (separate from Colloquy simulation)
-- **Status**: ❌ Design phase
-
-#### 9. Interactive Documentation Interview System
-
-**Multi-agent RAG application for knowledge capture and gap analysis**
-
-- **Purpose**: Systematically document the 2018 reconstruction process through AI-guided interviews with McLeish
-- **Key Features**:
-  - **Multi-Agent Interview**: Multiple AI agents ask clarifying questions from different perspectives (technical, historical, design rationale)
-  - **Document Analysis**: Upload existing documents (PDFs, notes, diagrams); AI identifies gaps, ambiguities, contradictions
-  - **Knowledge Graph Visualization**: Visual map of documented vs. missing knowledge, concept relationships, reconstruction timeline
-  - **Structured Output**: Generates formatted documentation for `docs/reference/mcleish/`
-- **Technology Stack** (2026 Best Practices):
-  - **Vector Store**: Supabase pgvector with HNSW indexing
-  - **Embeddings**: OpenAI `text-embedding-3-large` or domain-tuned model
-  - **LLM**: GPT-4 / Claude 3.5 for multi-agent orchestration
-  - **Knowledge Graph**: PostgreSQL with graph queries or Neo4j integration
-  - **Real-time Sync**: Supabase Realtime for live document updates
-  - **Frontend**: Next.js/React with visualization (D3.js, vis.js)
-- **Workflow**:
-  1. Upload existing reconstruction documents
-  2. AI agents analyze and identify knowledge gaps
-  3. Multi-agent interview session (competing/complementary questions)
-  4. Visualize knowledge structure and coverage
-  5. Generate formatted documentation
-  6. Iterate until comprehensive
-- **Data Storage**:
-  - Document chunks + embeddings in Supabase pgvector
-  - Interview transcripts and metadata
-  - Knowledge graph relationships
-  - Generated documentation versions
-- **Deployment**: Vercel (frontend + serverless API) + Supabase (backend + vector store)
-- **Repository**: Separate repository (to be created)
-- **Status**: ❌ Design phase; serves dual purpose as development tool and museum educational component
-
----
-
-## Deployment Strategy
-
-### Primary: Local Museum Deployment
-
-**Recommended for production installation**
-
-```
-┌─────────────────────────────────────────────────────────┐
-│         Museum Local Network (No Internet Required)     │
-│                                                         │
-│  ┌──────────────────────────────────┐                   │
-│  │  Local Server (Laptop/Mini PC)   │                   │
-│  │  - npm start                     │                   │
-│  │  - WebSocket: ws://192.168.x.x   │                   │
-│  └──────────────────────────────────┘                   │
-│              │                                          │
-│     ┌────────┼────────┬──────────┬──────────┐           │
-│     ▼        ▼        ▼          ▼          ▼           │
-│  Sensor   3D View   VR View   Dashboard  Tablets        │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Benefits:**
-
-- ✅ No internet dependency (reliability)
-- ✅ Sub-millisecond latency (performance)
-- ✅ No hosting costs
-- ✅ Privacy (data never leaves museum)
-- ✅ Simple setup: `npm start` on local machine
-
-**Setup:**
-
-1. Run simulation server on local device: `npm start`
-2. Note local IP address (e.g., `192.168.1.100:3000`)
-3. Connect all viewing lenses and sensor stations to `ws://192.168.1.100:3000`
-
-### Optional: Heroku Remote Deployment
-
-**For development, testing, and remote demos**
-
-- Allows testing from anywhere
-- Can showcase the work online
-- Same codebase, just deployed to Heroku instead of local network
-
----
-
-## Hardware Requirements (Museum Installation)
-
-### Network Infrastructure
-
-#### Core Components (Ethernet - Mission Critical)
-
-All performance-critical devices use wired Ethernet connections for guaranteed low latency and reliability:
-
-- **Server Device** (1x)
-  - Laptop or mini PC (Intel NUC, Mac Mini, etc.)
-  - Minimum: 4GB RAM, modern CPU, 10GB storage
-  - Ethernet port (or USB-to-Ethernet adapter)
-  - Runs simulation server (`npm start`)
-
-- **Gigabit Ethernet Switch** (1x)
-  - 8-16 ports depending on installation scale
-  - Unmanaged switch sufficient
-  - Example: Netgear GS308, TP-Link TL-SG108
-
-- **Ethernet Cables** (Cat5e or Cat6)
-  - One cable per wired device
-  - Various lengths: 10ft, 25ft, 50ft assortment
-
-- **Client Devices** (multiple)
-  - Sensor stations: Laptops/tablets with webcams and microphones
-  - Display screens: Computers connected to monitors/projectors
-  - VR PCs: Gaming PCs for PC VR headsets (if using Vive, Index, etc.)
-  - Dashboard displays: Laptops or dedicated screens
-
-#### Optional: WiFi Access Point
-
-WiFi for **administrative access only** (not for critical components):
-
-- WiFi router connected to Ethernet switch
-- Used for: Remote desktop, staff monitoring, development/debugging
-- Does not affect visitor-facing performance
-
-### Network Topology
-
-```
-┌───────────────────────────────────────────────────┐
-│         Museum LAN (Ethernet Backbone)            │
-│                                                   │
-│  ┌──────────────┐                                 │
-│  │ Server       │                                 │
-│  │ 192.168.1.1  │                                 │
-│  └──────┬───────┘                                 │
-│         │ Ethernet                                │
-│  ┌──────▼─────────────────────┐                   │
-│  │  Gigabit Switch (16-port)  │                   │
-│  └─┬──┬──┬──┬──┬──┬──┬──┬──┬──┘                   │
-│    │  │  │  │  │  │  │  │  │                      │
-│    ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼                      │
-│   S1 S2 S3 D1 D2 D3 VR DB WiFi                    │
-│                              (admin only)         │
-└───────────────────────────────────────────────────┘
-
-S  = Sensor Station (Ethernet)
-D  = Display Screen (Ethernet)
-VR = VR PC (Ethernet)
-DB = Dashboard (Ethernet)
-```
-
-### Installation Setup Steps
-
-1. Connect server to switch via Ethernet
-2. Start simulation server: `npm start`
-3. Note server IP address (e.g., `192.168.1.1:3000`)
-4. Connect all client devices to switch via Ethernet
-5. Configure each client to connect to `ws://192.168.1.1:3000`
-6. (Optional) Connect WiFi router for admin access
-
----
-
-## Software Architecture
-
-The installation consists of **6 modular components** communicating via WebSocket:
-
-### Component Overview
-
-```
-┌─────────────┐  ┌─────────────┐
-│Light Sensor │  │Sound Sensor │
-│   App       │  │    App      │
-└──────┬──────┘  └──────┬──────┘
-       │                │
-       │ WebSocket      │ WebSocket
-       │ (publish)      │ (publish)
-       └────────┬───────┘
-                ▼
-       ┌────────────────┐
-       │ Core Simulation│
-       │     Server     │
-       │  (This Repo)   │
-       └────────┬───────┘
-                │
-                │ WebSocket (broadcast)
-                │
-    ┌───────────┼───────────┐
-    ▼           ▼           ▼
-┌────────┐ ┌────────┐ ┌──────────┐
-│3D      │ │VR      │ │Time      │
-│Renderer│ │Renderer│ │Series    │
-└────────┘ └────────┘ └──────────┘
-```
-
----
-
-### 1. Light Sensor App
-
-**Webcam-based light detection simulating Female Mobile's oscillating vertical reflector**
-
-- **Purpose**: Detect visitor light interactions (flashlight, phone screen, etc.)
-- **Input**: Webcam feed (wide-angle lens preferred)
-- **Processing**:
-  - Oscillating rectangular zone sweeps across video frame (mimics Female's vertical reflector motion)
-  - Background subtraction: capture baseline image, compare current frame against it
-  - Light level detection in active zone vs. background threshold
-  - Activation trigger when light exceeds threshold
-- **Output**: WebSocket events
-  ```typescript
-  {type: 'light', intensity: 0.0-1.0, zone: number, timestamp: number}
-  ```
-- **Technology**: Node.js + TypeScript
-  - Camera: `node-webcam` or `opencv4nodejs`
-  - Image processing: `canvas` or `jimp`
-  - WebSocket: `socket.io-client`
-- **Repository**: `apps/sensor-light/` (to be created)
-- **Status**: ❌ Needs prototyping
-
----
-
-### 2. Sound Sensor App
-
-**Microphone-based FFT frequency analysis with bandpass filtering**
-
-- **Purpose**: Detect visitor sound interactions (voice, clapping, whistling, etc.)
-- **Input**: Microphone audio stream (webcam mic or dedicated microphone)
-- **Processing**:
-  - FFT (Fast Fourier Transform) on incoming audio
-  - Peak detection at different frequency bins
-  - Bandpass filter (configurable high-pass + low-pass = notch filter)
-  - Configurable frequency windows for different interaction types
-- **Output**: WebSocket events
-  ```typescript
-  {type: 'sound', frequencies: Array<{freq: number, amplitude: number}>, timestamp: number}
-  ```
-- **Technology**: Node.js + TypeScript
-  - Audio capture: `node-mic` or `node-record-lpcm16`
-  - FFT processing: `fft.js` or `dsp.js`
-  - WebSocket: `socket.io-client`
-- **Repository**: `apps/sensor-sound/` (to be created)
-- **Status**: ❌ Needs prototyping
-
----
-
-### 3. Core Simulation Server
-
-**Stateful agent simulation engine (this repository)**
-
-- **Purpose**: Single source of truth for all agent behaviors and state
-- **Input**: Sensor events via WebSocket (light, sound)
-- **Processing**:
-  - Agent state machines (Male/Female/Beam behaviors)
-  - Drive system updates (O/P drives increment over time, decrement on satisfaction)
-  - Interaction logic (pattern matching, engagement, arbitration)
-  - Continuous simulation loop (runs independently of sensor input)
-- **Output**: Steady stream of simulation state via WebSocket broadcast
-  ```javascript
-  {
-    agents: [
-      {id, position, rotation, state, drives: {O, P}, subsystems: {...}}
-    ],
-    interactions: [{agentA, agentB, type, timestamp}],
-    timestamp: ms
-  }
-  ```
-- **Technology**: Node.js + Express + Socket.io
-- **Repository**: Root of this repository (`server.js`, `lib/`)
-- **Status**: ⚠️ Core agent behaviors implemented; WebSocket pub/sub integration needed
-
----
-
-### 4. 3D Renderer (Screen View)
-
-**Traditional monitor/projection visualization**
-
-- **Purpose**: Primary visual display of the Colloquy simulation
-- **Input**: Simulation state stream (WebSocket subscriber)
-- **Rendering**:
-  - 3D scene with agent geometries
-  - Drive state visualizations
-  - Interaction effects (light/sound pulses)
-- **Output**: Real-time 3D graphics on screen/projector
-- **Technology**: THREE.js browser-based 3D
-- **Repository**: `apps/renderer-3d/` (to be created in Phase 8)
-- **Status**: ⏳ Planned (Phase 8 - museum installation)
-
----
-
-### 5. VR Renderer (XR View)
-
-**Immersive headset experience of the same simulation**
-
-- **Purpose**: Allow visitors to experience the Colloquy in immersive 3D space
-- **Input**: Same simulation state stream as 3D renderer
-- **Rendering**:
-  - Immersive 3D environment with stereoscopic rendering
-  - Spatial audio for agent interactions
-  - Hand tracking for potential interaction (future)
-- **Output**: WebXR-compatible VR experience
-- **Technology**: THREE.js + WebXR API or A-Frame
-- **Repository**: `apps/renderer-vr/` (to be created)
-- **Status**: ❌ Not yet implemented
-
----
-
-### 6. Time Series Renderer (Analytics Dashboard)
-
-**Real-time metrics and analytics visualization**
-
-- **Purpose**: Display live simulation data like video game stats
-- **Input**: Same simulation state stream
-- **Rendering**:
-  - Drive O/P levels over time (line charts)
-  - Interaction frequency heatmaps
-  - Agent state timelines
-  - Visitor engagement metrics
-- **Output**: Real-time dashboard with charts and graphs
-- **Technology**: Chart.js, D3.js, or similar visualization library
-- **Repository**: `apps/renderer-timeseries/` (to be created)
-- **Status**: ❌ Not yet implemented
-
----
-
-### Data Flow Summary
-
-1. **Sensors → Simulation**: Light/sound apps publish events to simulation server
-2. **Simulation Processing**: Server updates agent states, drive levels, interactions
-3. **Simulation → Renderers**: Server broadcasts state to all connected renderers
-4. **Renderers Subscribe**: Each renderer visualizes the same data differently (3D, VR, charts)
-
-All components are **loosely coupled** via WebSocket, allowing independent development, testing, and deployment.
-
----
-
----
-
-## Configuration & Loading
+## Configuration
 
 The simulation is data-driven, defined by a strict JSON configuration file.
 
-### **Config Format (v2)**
-We use a **Hybrid Scene Graph** approach where a single config file defines both the spatial hierarchy (Transform nodes) and the logical hierarchy (Mobiles, subsystems, components).
+### Config format (v2)
 
-- **Mobiles**: Top-level autonomous entities (Females, Males, Beam).
-- **Coordinate Systems**: Flat list of spatial transforms with parent references (avoiding deep nesting).
-- **Subsystems**: Logical parts of a Mobile (e.g., Horizontal Control) that drive specific coordinate systems.
-- **Components**: Physical attachments (Speakers, Microphones) positioned relative to the Mobile.
+A **hybrid scene graph**: one file defines both the spatial hierarchy (transform nodes) and the
+logical hierarchy (mobiles, subsystems, components).
 
-**Key File:** `apps/SimulationConfigurationFiles/config_v2.json` (validates against `simulation-config-v2.schema.json`)
+- **Mobiles**: top-level entities. `config_v2.json` declares six — three females, two males, one beam.
+- **Coordinate systems**: a flat list of spatial transforms with parent references, avoiding deep nesting. World, Armature, Plinth, then a base and one or two control frames per mobile.
+- **Subsystems**: logical parts of a mobile (`horizontal_control`, `vertical_control`) that drive specific coordinate systems.
+- **Components**: attachments (`sound_actuator`, `sound_sensor`, `light_sensor`, …) positioned relative to the mobile.
 
-### **SceneGraphLoader**
-The `SceneGraphLoader` class parses this config in two phases:
-1.  **Phase 1**: Builds the `Transform` hierarchy from `coordinateSystems`.
-2.  **Phase 2**: Instantiates `Mobile` objects, attaches `Subsystems` (oscillators), and creates `Sensors`/`Actuators`.
+Key file: `apps/SimulationConfigurationFiles/config_v2.json`, validated against
+`simulation-config-v2.schema.json`.
 
-See `lib/SceneGraphLoader.ts` for implementation details.
+### SceneGraphLoader
+
+`lib/SceneGraphLoader.ts` parses the config in two phases:
+
+1. Build the `Transform` hierarchy from `coordinateSystems`.
+2. Instantiate `Mobile` objects, attach subsystems (oscillators), create sensors and actuators.
+
+`lib/__tests__/SceneGraphLoader.test.ts` loads the real `config_v2.json` and asserts all six
+mobiles come back. It passes.
 
 ---
 
-## Technical Implementation Roadmap
+## Technology
 
-### Immediate (This Repository)
+- **TypeScript** — simulation logic and the newer visualization layer.
+- **Three.js `^0.168.0`** — the root's only runtime dependency.
+- **Vite** — per-demo build and dev server. A devDependency of each demo, not of the root.
+- **Jest + ts-jest** — unit tests.
+- **ESLint + Prettier** — quality and formatting.
+- **Vanilla TypeScript and custom CSS in the demos** — no React, Vue, Tailwind or Bootstrap. The demos put their weight into the 3D simulation, not the interface, and the UI in each is small enough that a framework would be pure overhead. See [`docs/UI_ARCHITECTURE.md`](docs/UI_ARCHITECTURE.md) and [`docs/UI_STANDARDS.md`](docs/UI_STANDARDS.md).
+- **Vercel** — static hosting for the gallery and demos, via `vercel.json` (`buildCommand: npm run build:demos`, `outputDirectory: dist`, clean URLs, trailing slashes).
 
-- [x] Core simulation with agent behaviors
-- [x] Sensor/Actuator class library
-- [x] State machine diagrams and documentation
-- [ ] WebSocket server for real-time pub/sub
-- [ ] Sensor input event processing
-- [ ] Continuous simulation loop
-- [ ] State broadcast to subscribers
+---
 
-### Future Development
+## Provenance
 
-- [ ] Browser-based sensor station app
-- [ ] VR viewing lens (WebXR)
-- [ ] Time series dashboard
-- [ ] Conversational agents (separate Vercel apps)
-- [ ] Contemporary comparison interactive
+Commits run from **24 August 2024** to **21 July 2026**. Active development stopped in
+March 2026; the four commits after that are diagram work that has since moved to the flagship.
+
+Author: Thomas J McLeish, who built the 2018 physical reconstruction this simulation interprets.
+License: MIT.

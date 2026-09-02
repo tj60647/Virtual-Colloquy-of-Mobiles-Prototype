@@ -12,7 +12,7 @@
  * the logic for determining the current behavioral state (Satisfied, Searching, etc.).
  *
  * @see docs/terminology.md
- * @see docs/reference/mcleish/system-design/
+ * @see Colloquy-of-Mobiles-Virtual-Simulation (flagship) docs/colloquy/system-diagrams/
  */
 
 import { Drive } from './Drive';

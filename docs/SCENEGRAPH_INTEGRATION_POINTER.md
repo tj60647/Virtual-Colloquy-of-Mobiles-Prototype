@@ -1,19 +1,16 @@
-# SceneGraph Integration Pointer
+# Integration pointer - the live system is elsewhere
 
-This is a short pointer for simulation developers.
+This document used to point at a cross-repository integration guide. It pointed at a path
+that no longer exists, and the integration it described is no longer split across two
+repositories.
 
-Canonical cross-repo integration guidance is maintained in the SceneGraph repository:
+The whole live system - the ABM engine, the simulation server, the display client, Scene
+Studio, the guide, the clip editor, the simulation console, and the sensor, actuator and
+transmitter clients - now lives in one place:
 
-- `../Colloquy-of-Mobiles-Virtual-Simulation-SceneGraph/docs/RUNTIME_INTEGRATION_GUIDE.md`
+- [Colloquy-of-Mobiles-Virtual-Simulation](https://github.com/tj60647/Colloquy-of-Mobiles-Virtual-Simulation)
 
-Why this pointer exists:
+Its integration and runtime contracts are documented there, under `docs/infrastructure/`
+(start with `RUNTIME_INTEGRATION_GUIDE.md` and `SIMULATION_SCENEGRAPH_INTEGRATION.md`).
 
-- SceneGraph owns canonical schema/types/normalization contracts.
-- Virtual Simulation consumes those contracts for behavior/runtime systems.
-- Keeping one canonical guide avoids contract drift between repositories.
-
-Recommended related docs in this repository:
-
-- `docs/REFACTORING_PLAN.md`
-- `docs/PULSE_COMMUNICATION_ARCHITECTURE.md`
-- `docs/terminology.md`
+This repository is an archived prototype. Nothing here is a contract for anything.

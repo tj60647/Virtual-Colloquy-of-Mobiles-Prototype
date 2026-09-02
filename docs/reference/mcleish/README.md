@@ -1,41 +1,26 @@
 # McLeish 2018 Reconstruction Documentation
 
-This directory contains comprehensive documentation of the 2018 physical reconstruction of Pask's Colloquy of Mobiles by McLeish.
+This directory holds what remains, in this archived prototype, of the documentation of the
+2018 physical reconstruction of Pask's Colloquy of Mobiles by McLeish.
 
-## Documents
+## What is still here
 
-- `24.09.14 CoM2018 How It Works, Recollections, and Observations, CyberneticMedia + DDO.pdf` - Comprehensive documentation of the 2018 reconstruction
+- `24.09.14 CoM2018 How It Works, Recollections, and Observations, CyberneticMedia + DDO.pdf`
+  - The reconstruction's own account of how the system works, plus recollections and observations.
+- `implementation-map/`
+  - Placeholder for annotated diagrams bridging the technical specifications and the physical
+    build. It has always been empty.
 
-## Directory Structure
+## What moved, on 2 September 2026
 
-### `system-design/`
+These moved to the flagship repository,
+[Colloquy-of-Mobiles-Virtual-Simulation](https://github.com/tj60647/Colloquy-of-Mobiles-Virtual-Simulation),
+which is where the live system that consumes them now lives.
 
-**Technical specifications and behavioral logic**
+| Was here                                                                                                                              | Now                                       |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `system-design/` - the PlantUML diagram library (state, sequence, activity and class diagrams) and `DIAGRAM_ASSESSMENT_2026-07-18.md` | flagship `docs/colloquy/system-diagrams/` |
+| `physical-build/` - photographs, elevations and the light/sensor layout artwork                                                       | flagship `docs/colloquy/physical-build/`  |
 
-- PlantUML diagrams (state machines, sequence diagrams, class diagrams)
-- System architecture specifications
-- Agent behavior state machines
-- Drive system mechanics
-- Subsystem interaction protocols
-
-### `physical-build/`
-
-**Documentation of the actual built artifact**
-
-- Photos of the physical installation
-- Engineering drawings and schematics (PDFs)
-- Construction details and materials
-- Physical component specifications
-
-### `implementation-map/`
-
-**Integration documentation bridging design and physical build**
-
-- Annotated diagrams showing how technical specs map to physical components
-- "As-built" documentation
-- Component callouts linking code/behavior to physical hardware
-- Implementation notes and observations
-
-## About the 2018 Reconstruction
-
-This documentation represents McLeish's work in reconstructing Pask's original 1968 Colloquy of Mobiles installation. It serves as the canonical reference for this virtual simulation implementation, providing both the theoretical design and practical implementation details.
+The diagrams continued to be edited after this repository stopped being the working copy;
+the flagship versions are the current ones.
