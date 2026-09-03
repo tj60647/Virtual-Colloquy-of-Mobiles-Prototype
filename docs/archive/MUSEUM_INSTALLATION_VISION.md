@@ -2,13 +2,13 @@
 
 **Written:** 2024–February 2026, as part of the prototype repository's `readme.md`.
 **Archived:** 2 September 2026, when this repository became
-[Colloquy-of-Mobiles-Simulation-Prototype](https://github.com/tj60647/Colloquy-of-Mobiles-Simulation-Prototype).
+[Virtual-Colloquy-of-Mobiles-Prototype](https://github.com/tj60647/Virtual-Colloquy-of-Mobiles-Prototype).
 
 This is the original design vision for a distributed museum installation, lifted verbatim
 out of the prototype README. It is kept for the record, not as a plan.
 
 **Most of what follows now exists.** It was built in the flagship repository,
-[Colloquy-of-Mobiles-Virtual-Simulation](https://github.com/tj60647/Colloquy-of-Mobiles-Virtual-Simulation),
+[Virtual-Colloquy-of-Mobiles](https://github.com/tj60647/Virtual-Colloquy-of-Mobiles),
 and it did not arrive in the shape sketched here. What shipped:
 
 | Vision below                                | What was actually built (flagship repo)                                                  |

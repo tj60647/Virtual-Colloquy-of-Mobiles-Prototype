@@ -14,7 +14,7 @@ This directory holds what remains, in this archived prototype, of the documentat
 ## What moved, on 2 September 2026
 
 These moved to the flagship repository,
-[Colloquy-of-Mobiles-Virtual-Simulation](https://github.com/tj60647/Colloquy-of-Mobiles-Virtual-Simulation),
+[Virtual-Colloquy-of-Mobiles](https://github.com/tj60647/Virtual-Colloquy-of-Mobiles),
 which is where the live system that consumes them now lives.
 
 | Was here                                                                                                                              | Now                                       |

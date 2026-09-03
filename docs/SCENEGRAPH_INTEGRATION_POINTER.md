@@ -8,7 +8,7 @@ The whole live system - the ABM engine, the simulation server, the display clien
 Studio, the guide, the clip editor, the simulation console, and the sensor, actuator and
 transmitter clients - now lives in one place:
 
-- [Colloquy-of-Mobiles-Virtual-Simulation](https://github.com/tj60647/Colloquy-of-Mobiles-Virtual-Simulation)
+- [Virtual-Colloquy-of-Mobiles](https://github.com/tj60647/Virtual-Colloquy-of-Mobiles)
 
 Its integration and runtime contracts are documented there, under `docs/infrastructure/`
 (start with `RUNTIME_INTEGRATION_GUIDE.md` and `SIMULATION_SCENEGRAPH_INTEGRATION.md`).

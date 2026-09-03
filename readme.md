@@ -1,11 +1,13 @@
-# Colloquy of Mobiles Simulation Prototype — four teaching demos and the behavior model that came before the live system
+# Virtual Colloquy of Mobiles — Prototype
+
+Four teaching demos and the behaviour model that came before the live system.
 
 This repository is **archived**. It is the 2024–early-2026 TypeScript prototype for a virtual
 simulation of Gordon Pask's _Colloquy of Mobiles_: four working browser demos, a pre-consolidation
 behavior model in `lib/`, and a curriculum plan for demos that were never built. The live system —
 the agent-based simulation engine, the simulation server, the display client, Scene Studio, the
 guide, the clip editor, the simulation console, and the sensor, actuator and transmitter clients —
-moved to **[Colloquy-of-Mobiles-Virtual-Simulation](https://github.com/tj60647/Colloquy-of-Mobiles-Virtual-Simulation)**
+moved to **[Virtual-Colloquy-of-Mobiles](https://github.com/tj60647/Virtual-Colloquy-of-Mobiles)**
 — a private repository — and runs, publicly, at <https://colloquyscenestudio.aroughidea.com>.
 Go there for anything current.
 
