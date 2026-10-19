@@ -8,7 +8,7 @@ behavior model in `lib/`, and a curriculum plan for demos that were never built.
 the agent-based simulation engine, the simulation server, the display client, Scene Studio, the
 guide, the clip editor, the simulation console, and the sensor, actuator and transmitter clients —
 moved to **[Virtual-Colloquy-of-Mobiles](https://github.com/tj60647/Virtual-Colloquy-of-Mobiles)**
-— a private repository — and runs, publicly, at <https://colloquyscenestudio.aroughidea.com>.
+— a private repository — and runs, publicly, at <https://colloquyofmobiles.aroughidea.com>.
 Go there for anything current.
 
 What is kept here is worth keeping for two reasons. The four demos are good teaching objects: each
