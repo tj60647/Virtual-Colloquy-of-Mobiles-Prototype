@@ -33,6 +33,9 @@ if (existsSync(join(PUBLIC_DIR, 'index.html'))) {
 if (existsSync(join(PUBLIC_DIR, 'gallery.css'))) {
   cpSync(join(PUBLIC_DIR, 'gallery.css'), join(DIST_DIR, 'gallery.css'));
 }
+if (existsSync(join(PUBLIC_DIR, 'favicon.svg'))) {
+  cpSync(join(PUBLIC_DIR, 'favicon.svg'), join(DIST_DIR, 'favicon.svg'));
+}
 console.log('✅ Gallery copied');
 
 // Find all demo directories
