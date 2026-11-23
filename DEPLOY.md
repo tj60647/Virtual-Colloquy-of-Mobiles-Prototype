@@ -13,6 +13,11 @@ the project `virtual-colloquy-2024` in the `aroughidea` team. `server.js` and th
 - `lib/` is served at `/lib/` and `assets/` at `/assets/`.
 - `/<demo>` redirects to `/<demo>/`, as Express did.
 - Nothing else in the repository is served (`docs/`, `server.js`, `package.json`).
+  Any other path answers 404 "Page not found", as Express did.
+
+Deploy from a checkout with LF line endings (`git config core.autocrlf false`
+before checking out on Windows), so the files served are byte-for-byte the
+ones in Git.
 
 ## To redeploy
 
