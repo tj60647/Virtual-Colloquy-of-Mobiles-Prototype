@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Colloquy_of_Mobiles_favicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Colloquy of Mobiles">
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="523.4 474 562.4 406.5 339 19.5 261 19.5 37.6 406.5 76.6 474 523.4 474" fill="#d9d9d9" stroke="#111111" stroke-width="24"/>
+    <polygon points="123.3 402 300 96 476.7 402 123.3 402" fill="#bfbfbf" fill-opacity=".55" stroke="#777777" stroke-width="10"/>
+  </g>
+
+  <g fill="#ffffff" stroke="#111111" stroke-width="14">
+    <circle cx="300" cy="96" r="40"/>
+    <circle cx="123.3" cy="402" r="40"/>
+    <circle cx="476.7" cy="402" r="40"/>
+  </g>
+
+  <g stroke="#111111" stroke-linejoin="round">
+    <polygon points="300 218 332 250 314 300 332 350 300 382 268 350 286 300 268 250" fill="#404040" stroke-width="14"/>
+    <rect x="291" y="226" width="18" height="148" fill="#b8b8b8" stroke-width="8"/>
+    <circle cx="300" cy="300" r="13" fill="#d9d9d9" stroke-width="8"/>
+  </g>
+</svg>
