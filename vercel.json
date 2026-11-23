@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo 'static files only, nothing to install'",
+  "buildCommand": "mkdir -p _site && cp -r apps/public/. _site/ && for d in apps/demo-*/public; do n=$(basename $(dirname $d)); mkdir -p _site/$n && cp -r $d/. _site/$n/; done && cp -r lib assets _site/ && printf 'Page not found' > _site/404.html",
+  "outputDirectory": "_site",
+  "cleanUrls": false,
+  "redirects": [
+    {
+      "source": "/:dir(demo-[^/]+|lib|assets|lib/tests)",
+      "destination": "/:dir/",
+      "statusCode": 301
+    }
+  ]
+}
